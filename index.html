@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
 :root{
   --paper:#F2ECDF;
@@ -212,13 +213,10 @@ main.journal{
 }
 .stop{
   display:grid;
-  grid-template-columns:40px 92px 1fr;
+  grid-template-columns:40px 1fr;
   gap:20px;
   padding-bottom:34px;
   position:relative;
-}
-.stop.transit{
-  grid-template-columns:40px 1fr;
 }
 .stop:last-child{ padding-bottom:0; }
 .stop-index{
@@ -281,30 +279,64 @@ main.journal{
 }
 .callout strong{ color:var(--ink); font-weight:600; }
 
-/* ---------- Per-stop map thumbnail (Google Maps iframe) ---------- */
-.stop-thumb{
-  width:92px;
-  height:92px;
+/* ---------- Map ---------- */
+.map-wrap{
+  margin-bottom:36px;
   border:1px solid var(--rule);
-  background:var(--paper-raised);
-  overflow:hidden;
   position:relative;
-  flex:0 0 auto;
 }
-.stop-thumb iframe{
+.map-wrap .leaflet-container{
+  height:340px;
   width:100%;
-  height:100%;
-  border:0;
-  pointer-events:none; /* acts as a static preview, not a draggable map */
+  background:var(--paper-raised);
+  font-family:var(--sans);
 }
-.stop-thumb.empty{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--sage);
-  font-size:11px;
-  text-align:center;
-  padding:6px;
+.map-label{
+  position:absolute;
+  top:12px; left:12px;
+  z-index:400;
+  background:var(--paper);
+  border:1px solid var(--rule);
+  padding:4px 10px;
+  font-size:12px;
+  color:var(--ink-soft);
+  pointer-events:none;
+}
+.leaflet-popup-content-wrapper{
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:0;
+  box-shadow:0 2px 10px rgba(36,31,27,0.18);
+}
+.leaflet-popup-content{
+  font-family:var(--sans);
+  margin:10px 12px;
+}
+.leaflet-popup-content b{
+  font-family:var(--serif);
+  font-size:15px;
+  display:block;
+  margin-bottom:2px;
+}
+.leaflet-popup-tip{ background:var(--paper); }
+.marker-pin{
+  width:26px; height:26px;
+  border-radius:50% 50% 50% 0;
+  background:var(--terracotta);
+  transform:rotate(-45deg);
+  border:1.5px solid var(--paper);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+.marker-pin span{
+  transform:rotate(45deg);
+  color:var(--paper);
+  font-family:var(--serif);
+  font-size:12px;
+  font-weight:600;
+}
+.marker-pin.transit-pin{
+  background:var(--sage);
 }
 
 /* mobile rail */
@@ -348,8 +380,6 @@ footer{
   .day-head{ gap:16px; }
   h1.hero-title{ max-width:none; }
   main.journal{ padding:32px 0 70px; }
-  .stop{ grid-template-columns:40px 1fr; }
-  .stop-thumb{ display:none; }
 }
 </style>
 </head>
@@ -388,21 +418,19 @@ footer{
 
 <footer>Built for a trip to Tbilisi · pinch to zoom on mobile · tap a stop to open directions</footer>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-// mode: "walking" or "driving" -> controls the Google Maps directions embed mode.
-// noRoute: true -> day has alternative options rather than a single sequence, so no route is drawn.
 const days = [
   {
     date:"Tue, Sept 8",
     tag:"Old Town",
     title:"Baths, fortress, river",
     intro:"Everything today sits within a 20-minute walk of everything else. No taxis needed.",
-    mode:"walking",
     stops:[
-      {time:"10:00", name:"Abanotubani sulfur baths", note:"The domed bathhouse district — walk through, or book a private soak if you want one.", map:"Abanotubani Tbilisi"},
-      {time:"12:00", name:"Narikala Fortress + Mother of Georgia", note:"Cable car up from Rike Park saves the climb; walk the ramparts, then descend on foot.", map:"Narikala Fortress Tbilisi"},
-      {time:"15:00", name:"Bridge of Peace & Rike Park", note:"The glass footbridge over the Mtkvari — best light in late afternoon.", map:"Bridge of Peace Tbilisi"},
-      {time:"19:30", name:"Dinner, Shardeni Street", note:"The old town's café strip — easy, no reservation needed.", map:"Shardeni Street Tbilisi"}
+      {time:"10:00", name:"Abanotubani sulfur baths", note:"The domed bathhouse district — walk through, or book a private soak if you want one.", map:"Abanotubani Tbilisi", lat:41.6876347, lng:44.8106766},
+      {time:"12:00", name:"Narikala Fortress + Mother of Georgia", note:"Cable car up from Rike Park saves the climb; walk the ramparts, then descend on foot.", map:"Narikala Fortress Tbilisi", lat:41.6880478, lng:44.808764},
+      {time:"15:00", name:"Bridge of Peace & Rike Park", note:"The glass footbridge over the Mtkvari — best light in late afternoon.", map:"Bridge of Peace Tbilisi", lat:41.6930019, lng:44.8082861},
+      {time:"19:30", name:"Dinner, Shardeni Street", note:"The old town's café strip — easy, no reservation needed.", map:"Shardeni Street Tbilisi", lat:41.690477, lng:44.808438}
     ]
   },
   {
@@ -410,15 +438,14 @@ const days = [
     tag:"New Town + Museums",
     title:"Rustaveli to Sameba",
     intro:"Walking through midday, one taxi hop out to the cathedral in the afternoon.",
-    mode:"driving",
     stops:[
-      {time:"10:00", name:"Freedom Square", note:"Starting point for Rustaveli Avenue.", map:"Freedom Square Tbilisi"},
-      {time:"10:20", name:"Rustaveli Avenue", note:"Tbilisi's grand boulevard — theatres, opera house, parliament.", map:"Rustaveli Avenue Tbilisi"},
-      {time:"11:00", name:"Georgian National Museum", note:"The archaeological gold collection is the highlight if time is short.", map:"Georgian National Museum Tbilisi"},
-      {time:"13:30", name:"Dry Bridge flea market", note:"Soviet ephemera, old coins, hand-woven textiles.", map:"Dry Bridge Market Tbilisi"},
+      {time:"10:00", name:"Freedom Square", note:"Starting point for Rustaveli Avenue.", map:"Freedom Square Tbilisi", lat:41.6930929, lng:44.801904},
+      {time:"10:20", name:"Rustaveli Avenue", note:"Tbilisi's grand boulevard — theatres, opera house, parliament.", map:"Rustaveli Avenue Tbilisi", lat:41.6997954, lng:44.7968214},
+      {time:"11:00", name:"Georgian National Museum", note:"The archaeological gold collection is the highlight if time is short.", map:"Georgian National Museum", lat:41.6960103, lng:44.8002318},
+      {time:"13:30", name:"Dry Bridge flea market", note:"Soviet ephemera, old coins, hand-woven textiles.", map:"Dry Bridge Market Tbilisi", lat:41.7009962, lng:44.8031177},
       {time:"15:30", name:"Taxi to Sameba Cathedral", note:"Dress modestly — shoulders and knees covered. Tourists generally let in after 11am.", map:"", transit:true},
-      {time:"16:00", name:"Holy Trinity Cathedral (Sameba)", note:"Georgia's largest cathedral, on a hill above the city.", map:"Sameba Cathedral Tbilisi"},
-      {time:"19:00", name:"Evening at Fabrika", note:"Former Soviet sewing factory turned courtyard bars, shops, and hostel.", map:"Fabrika Tbilisi"}
+      {time:"16:00", name:"Holy Trinity Cathedral (Sameba)", note:"Georgia's largest cathedral, on a hill above the city.", map:"Sameba Cathedral Tbilisi", lat:41.6976516, lng:44.8164521},
+      {time:"19:00", name:"Evening at Fabrika", note:"Former Soviet sewing factory turned courtyard bars, shops, and hostel.", map:"Fabrika Tbilisi", lat:41.7094157, lng:44.8028859}
     ]
   },
   {
@@ -426,13 +453,12 @@ const days = [
     tag:"Driver day",
     title:"Didgori, Manglisi, Mtskheta",
     intro:"Hire a driver for the full day — Didgori is remote with little to flag a ride back with. Bolt or Yandex Go both work for booking.",
-    mode:"driving",
     stops:[
       {time:"09:00", name:"Depart Tbilisi by car", note:"~1–1.5h to Didgori.", map:"", transit:true},
-      {time:"10:30", name:"Didgori Battle Memorial", note:"The \"Broken Sword Mountain\" site, commemorating the 1121 battle. Windy — bring a layer.", map:"Didgori Battle Memorial"},
-      {time:"12:30", name:"Manglisi Sioni Cathedral", note:"11th-century cathedral in a quiet mountain town near Didgori.", map:"Manglisi Sioni Cathedral"},
-      {time:"14:30", name:"Jvari Monastery", note:"6th-century monastery on the hill overlooking Mtskheta's river confluence.", map:"Jvari Monastery"},
-      {time:"16:00", name:"Svetitskhoveli Cathedral, Mtskheta", note:"Georgia's spiritual center — where Georgia's conversion to Christianity is rooted.", map:"Svetitskhoveli Cathedral"},
+      {time:"10:30", name:"Didgori Battle Memorial", note:"The \"Broken Sword Mountain\" site, commemorating the 1121 battle. Windy — bring a layer.", map:"Didgori Battle Memorial", lat:41.7608389, lng:44.5081214},
+      {time:"12:30", name:"Manglisi Sioni Cathedral", note:"11th-century cathedral in a quiet mountain town near Didgori.", map:"Manglisi Sioni Cathedral", lat:41.6984662, lng:44.3568012},
+      {time:"14:30", name:"Jvari Monastery", note:"6th-century monastery on the hill overlooking Mtskheta's river confluence.", map:"Jvari Monastery", lat:41.8385275, lng:44.7332342},
+      {time:"16:00", name:"Svetitskhoveli Cathedral, Mtskheta", note:"Georgia's spiritual center — where Georgia's conversion to Christianity is rooted.", map:"Svetitskhoveli Cathedral", lat:41.842192, lng:44.7208789},
       {time:"18:00", name:"Drive back to Tbilisi", note:"~30 min.", map:"", transit:true}
     ]
   },
@@ -441,12 +467,11 @@ const days = [
     tag:"Driver day",
     title:"Kazbegi",
     intro:"The longest day — roughly 3 hours each way on the Georgian Military Highway. Consider swapping for Kakheti if two driving days feels like too much.",
-    mode:"driving",
     stops:[
       {time:"08:00", name:"Depart Tbilisi", note:"Georgian Military Highway north.", map:"", transit:true},
-      {time:"09:30", name:"Ananuri Fortress", note:"Stop on the way — fortress complex on the Zhinvali Reservoir.", map:"Ananuri Fortress"},
-      {time:"11:30", name:"Arrive Stepantsminda (Kazbegi)", note:"Base village below Mount Kazbek.", map:"Stepantsminda Georgia"},
-      {time:"12:00", name:"Gergeti Trinity Church", note:"By 4x4 up the track, or a ~1.5h hike if you want the climb.", map:"Gergeti Trinity Church"},
+      {time:"09:30", name:"Ananuri Fortress", note:"Stop on the way — fortress complex on the Zhinvali Reservoir.", map:"Ananuri Fortress", lat:42.1638157, lng:44.7029898},
+      {time:"11:30", name:"Arrive Stepantsminda (Kazbegi)", note:"Base village below Mount Kazbek.", map:"Stepantsminda", lat:42.6583174, lng:44.6409521},
+      {time:"12:00", name:"Gergeti Trinity Church", note:"By 4x4 up the track, or a ~1.5h hike if you want the climb.", map:"Gergeti Trinity Church", lat:42.6622002, lng:44.6202572},
       {time:"15:00", name:"Drive back to Tbilisi", note:"~3h, arriving evening.", map:"", transit:true}
     ]
   },
@@ -455,12 +480,10 @@ const days = [
     tag:"Free day",
     title:"Buffer — or Kakheti",
     intro:"Left open on purpose. Good for anything skipped earlier, a slow walking day, or swap in Kakheti wine country if you'd rather not repeat a long drive.",
-    mode:"driving",
-    noRoute:true,
     stops:[
-      {time:"—", name:"Option A: Slow city day (Sololaki)", note:"Revisit a neighborhood, extend the sulfur bath soak, wander Vera or Sololaki's balconied streets.", map:"Sololaki Tbilisi"},
-      {time:"—", name:"Option B: Sighnaghi (Kakheti)", note:"The walled hill town — similar distance to Kazbegi, gentler pace, wine tastings along the way.", map:"Sighnaghi Georgia"},
-      {time:"—", name:"Option B: Bodbe Monastery", note:"2km from Sighnaghi — St. Nino's resting place, gardens over the Alazani Valley.", map:"Bodbe Monastery"}
+      {time:"—", name:"Option A: Slow city day (Sololaki)", note:"Revisit a neighborhood, extend the sulfur bath soak, wander Vera or Sololaki's balconied streets.", map:"Sololaki Tbilisi", lat:41.6912, lng:44.7998},
+      {time:"—", name:"Option B: Sighnaghi (Kakheti)", note:"The walled hill town — similar distance to Kazbegi, gentler pace, wine tastings along the way.", map:"Sighnaghi Georgia", lat:41.6200278, lng:45.922355},
+      {time:"—", name:"Option B: Bodbe Monastery", note:"2km from Sighnaghi — St. Nino's resting place, gardens over the Alazani Valley.", map:"Bodbe Monastery", lat:41.6062906, lng:45.9338533}
     ]
   },
   {
@@ -468,26 +491,15 @@ const days = [
     tag:"Departure",
     title:"Last morning, flight ~22:00",
     intro:"A light day — most of it is packing and a last walk, with the evening kept clear for the airport.",
-    mode:"driving",
     stops:[
-      {time:"11:00", name:"Shardeni Street", note:"Last coffee and any souvenirs before heading back to pack.", map:"Shardeni Street Tbilisi"},
-      {time:"19:00", name:"Head to Tbilisi International Airport", note:"Flight around 22:00 — allow time for evening traffic.", map:"Tbilisi International Airport", transit:true}
+      {time:"11:00", name:"Shardeni Street", note:"Last coffee and any souvenirs before heading back to pack.", map:"Shardeni Street Tbilisi", lat:41.690477, lng:44.808438},
+      {time:"19:00", name:"Head to Tbilisi International Airport", note:"Flight around 22:00 — allow time for evening traffic.", map:"Tbilisi International Airport", transit:true, lat:41.6692, lng:44.9547}
     ]
   }
 ];
 
 const rail = document.getElementById('rail');
 const journal = document.getElementById('journal');
-
-// Small static-looking Google Maps preview (no API key needed) centered
-// on a single place — just a pin on a map, not a route.
-function stopThumbHtml(s){
-  if(!s.map){
-    return `<div class="stop-thumb empty">no fixed stop</div>`;
-  }
-  const src = `https://maps.google.com/maps?q=${encodeURIComponent(s.map)}&z=15&output=embed`;
-  return `<div class="stop-thumb"><iframe src="${src}" loading="lazy" title="${s.name}"></iframe></div>`;
-}
 
 days.forEach((d, i) => {
   const btn = document.createElement('button');
@@ -503,11 +515,9 @@ days.forEach((d, i) => {
   let stopsHtml = '';
   d.stops.forEach((s, si) => {
     const mapLink = s.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.map)}" target="_blank" rel="noopener">Get directions</a>` : '';
-    const thumb = s.transit ? '' : stopThumbHtml(s);
     stopsHtml += `
       <li class="stop${s.transit ? ' transit' : ''}">
         <div class="stop-index">${s.transit ? '→' : si+1}</div>
-        ${thumb}
         <div class="stop-body">
           <div class="stop-time">${s.time}</div>
           <div class="stop-name">${s.name}</div>
@@ -526,10 +536,58 @@ days.forEach((d, i) => {
         <p>${d.intro}</p>
       </div>
     </div>
+    <div class="map-wrap">
+      <div class="map-label">Day ${i+1} route</div>
+      <div id="map-${i}"></div>
+    </div>
     <ul class="stops">${stopsHtml}</ul>
   `;
   journal.appendChild(panel);
 });
+
+// ---------- Maps ----------
+const maps = {};
+function pinIcon(label, transit){
+  return L.divIcon({
+    className: '',
+    html: `<div class="marker-pin${transit ? ' transit-pin' : ''}"><span>${label}</span></div>`,
+    iconSize:[26,26],
+    iconAnchor:[13,26],
+    popupAnchor:[0,-24]
+  });
+}
+
+function buildMap(i){
+  const d = days[i];
+  const withCoords = d.stops.filter(s => s.lat && s.lng);
+  if(withCoords.length === 0) return;
+
+  const map = L.map(`map-${i}`, { scrollWheelZoom:false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'&copy; OpenStreetMap contributors',
+    maxZoom:18
+  }).addTo(map);
+
+  const latlngs = [];
+  let stopNum = 1;
+  withCoords.forEach(s => {
+    const icon = pinIcon(s.transit ? '→' : stopNum, s.transit);
+    if(!s.transit) stopNum++;
+    const marker = L.marker([s.lat, s.lng], {icon}).addTo(map);
+    marker.bindPopup(`<b>${s.name}</b>${s.time && s.time !== '—' ? s.time : ''}`);
+    latlngs.push([s.lat, s.lng]);
+  });
+
+  if(latlngs.length > 1){
+    L.polyline(latlngs, { color:'#A8472E', weight:2, opacity:0.55, dashArray:'5,6' }).addTo(map);
+  }
+
+  const bounds = L.latLngBounds(latlngs);
+  map.fitBounds(bounds, { padding:[36,36] });
+  if(latlngs.length === 1) map.setZoom(14);
+
+  maps[i] = map;
+}
 
 function showDay(i){
   document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
@@ -537,6 +595,12 @@ function showDay(i){
   document.getElementById(`day-${i}`).classList.add('active');
   document.querySelector(`.rail button[data-index="${i}"]`).classList.add('active');
   window.scrollTo({top:0, behavior:'smooth'});
+
+  if(!maps[i]){
+    buildMap(i);
+  } else {
+    setTimeout(() => maps[i].invalidateSize(), 50);
+  }
 }
 showDay(0);
 </script>
