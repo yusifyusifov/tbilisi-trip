@@ -212,10 +212,13 @@ main.journal{
 }
 .stop{
   display:grid;
-  grid-template-columns:40px 1fr;
+  grid-template-columns:40px 92px 1fr;
   gap:20px;
   padding-bottom:34px;
   position:relative;
+}
+.stop.transit{
+  grid-template-columns:40px 1fr;
 }
 .stop:last-child{ padding-bottom:0; }
 .stop-index{
@@ -278,39 +281,30 @@ main.journal{
 }
 .callout strong{ color:var(--ink); font-weight:600; }
 
-/* ---------- Map (Google Maps iframe) ---------- */
-.map-wrap{
-  margin-bottom:36px;
+/* ---------- Per-stop map thumbnail (Google Maps iframe) ---------- */
+.stop-thumb{
+  width:92px;
+  height:92px;
   border:1px solid var(--rule);
-  position:relative;
   background:var(--paper-raised);
+  overflow:hidden;
+  position:relative;
+  flex:0 0 auto;
 }
-.map-wrap iframe{
-  display:block;
+.stop-thumb iframe{
   width:100%;
-  height:360px;
+  height:100%;
   border:0;
+  pointer-events:none; /* acts as a static preview, not a draggable map */
 }
-.map-label{
-  position:absolute;
-  top:12px; left:12px;
-  z-index:5;
-  background:var(--paper);
-  border:1px solid var(--rule);
-  padding:4px 10px;
-  font-size:12px;
-  color:var(--ink-soft);
-  pointer-events:none;
-}
-.map-empty{
-  height:140px;
+.stop-thumb.empty{
   display:flex;
   align-items:center;
   justify-content:center;
-  color:var(--ink-soft);
-  font-size:14px;
+  color:var(--sage);
+  font-size:11px;
   text-align:center;
-  padding:0 24px;
+  padding:6px;
 }
 
 /* mobile rail */
@@ -354,7 +348,8 @@ footer{
   .day-head{ gap:16px; }
   h1.hero-title{ max-width:none; }
   main.journal{ padding:32px 0 70px; }
-  .map-wrap iframe{ height:280px; }
+  .stop{ grid-template-columns:40px 1fr; }
+  .stop-thumb{ display:none; }
 }
 </style>
 </head>
@@ -484,23 +479,14 @@ const days = [
 const rail = document.getElementById('rail');
 const journal = document.getElementById('journal');
 
-// Builds a Google Maps iframe URL (no API key required) that draws the
-// day's route in order, or falls back to a single-point map / a plain
-// message when a route doesn't make sense for that day.
-function buildMapEmbed(day){
-  const points = day.stops.filter(s => s.map).map(s => s.map);
-  if(points.length === 0) return null;
-  if(day.noRoute || points.length === 1){
-    return `https://maps.google.com/maps?q=${encodeURIComponent(points[0])}&t=&z=12&output=embed`;
+// Small static-looking Google Maps preview (no API key needed) centered
+// on a single place — just a pin on a map, not a route.
+function stopThumbHtml(s){
+  if(!s.map){
+    return `<div class="stop-thumb empty">no fixed stop</div>`;
   }
-  const origin = encodeURIComponent(points[0]);
-  const dest = encodeURIComponent(points[points.length - 1]);
-  const waypoints = points.slice(1, -1).map(p => encodeURIComponent(p));
-  const daddr = waypoints.length
-    ? `${waypoints.join('+to:')}+to:${dest}`
-    : dest;
-  const dirflg = day.mode === 'walking' ? 'w' : 'd';
-  return `https://maps.google.com/maps?saddr=${origin}&daddr=${daddr}&dirflg=${dirflg}&output=embed`;
+  const src = `https://maps.google.com/maps?q=${encodeURIComponent(s.map)}&z=15&output=embed`;
+  return `<div class="stop-thumb"><iframe src="${src}" loading="lazy" title="${s.name}"></iframe></div>`;
 }
 
 days.forEach((d, i) => {
@@ -517,9 +503,11 @@ days.forEach((d, i) => {
   let stopsHtml = '';
   d.stops.forEach((s, si) => {
     const mapLink = s.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.map)}" target="_blank" rel="noopener">Get directions</a>` : '';
+    const thumb = s.transit ? '' : stopThumbHtml(s);
     stopsHtml += `
       <li class="stop${s.transit ? ' transit' : ''}">
         <div class="stop-index">${s.transit ? '→' : si+1}</div>
+        ${thumb}
         <div class="stop-body">
           <div class="stop-time">${s.time}</div>
           <div class="stop-name">${s.name}</div>
@@ -528,12 +516,6 @@ days.forEach((d, i) => {
         </div>
       </li>`;
   });
-
-  const embedUrl = buildMapEmbed(d);
-  const mapLabel = d.noRoute ? 'Area overview' : (d.mode === 'walking' ? 'Day ' + (i+1) + ' walking route' : 'Day ' + (i+1) + ' driving route');
-  const mapHtml = embedUrl
-    ? `<div class="map-label">${mapLabel}</div><iframe src="${embedUrl}" loading="lazy" allowfullscreen title="Day ${i+1} map"></iframe>`
-    : `<div class="map-empty">No fixed route today.</div>`;
 
   panel.innerHTML = `
     <div class="day-head">
@@ -544,7 +526,6 @@ days.forEach((d, i) => {
         <p>${d.intro}</p>
       </div>
     </div>
-    <div class="map-wrap">${mapHtml}</div>
     <ul class="stops">${stopsHtml}</ul>
   `;
   journal.appendChild(panel);
