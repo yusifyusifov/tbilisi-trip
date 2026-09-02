@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tbilisi, 6 Days — Trip Journal</title>
+<meta name="description" content="A walking itinerary for six days in Tbilisi, Georgia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDF;
+  --paper-raised:#EAE2D0;
+  --ink:#241F1B;
+  --ink-soft:#5B534A;
+  --terracotta:#A8472E;
+  --forest:#4B5D45;
+  --sage:#8C9A7B;
+  --gold:#C9A876;
+  --rule: rgba(36,31,27,0.14);
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter', -apple-system, sans-serif;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(168,71,46,0.04) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(75,93,69,0.05) 0%, transparent 50%);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{color:inherit;}
+
+.wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+
+/* ---------- Header ---------- */
+header.hero{
+  padding:64px 0 40px;
+  border-bottom:1px solid var(--rule);
+}
+.hero-eyebrow-row{
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+  margin-bottom:10px;
+  color:var(--ink-soft);
+  font-size:14px;
+}
+.hero-eyebrow-row .dot{ color:var(--gold); }
+h1.hero-title{
+  font-family:var(--serif);
+  font-weight:500;
+  font-size:clamp(40px, 6vw, 68px);
+  line-height:1.02;
+  letter-spacing:-0.01em;
+  max-width:14ch;
+}
+h1.hero-title em{
+  font-style:italic;
+  color:var(--terracotta);
+  font-weight:400;
+}
+.hero-sub{
+  margin-top:18px;
+  max-width:52ch;
+  font-size:17px;
+  color:var(--ink-soft);
+}
+.hero-meta{
+  display:flex; gap:32px; flex-wrap:wrap;
+  margin-top:32px;
+}
+.hero-meta div{ font-size:14px; color:var(--ink-soft); }
+.hero-meta strong{
+  display:block;
+  font-family:var(--serif);
+  font-size:22px;
+  font-weight:500;
+  color:var(--ink);
+  margin-top:2px;
+}
+
+/* ---------- Layout: rail + journal ---------- */
+.layout{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:0;
+  align-items:start;
+}
+
+nav.rail{
+  position:sticky;
+  top:0;
+  padding:36px 0;
+  border-right:1px solid var(--rule);
+  height:100vh;
+  overflow-y:auto;
+}
+.rail-label{
+  font-size:12px;
+  color:var(--ink-soft);
+  letter-spacing:0.03em;
+  margin-bottom:18px;
+  padding-right:24px;
+}
+.rail button{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  width:100%;
+  background:none;
+  border:none;
+  text-align:left;
+  cursor:pointer;
+  padding:13px 24px 13px 0;
+  font-family:var(--sans);
+  color:var(--ink-soft);
+  border-left:2px solid transparent;
+  padding-left:18px;
+  transition:color .15s ease, border-color .15s ease;
+}
+.rail button .num{
+  font-family:var(--serif);
+  font-size:20px;
+  color:var(--ink-soft);
+  min-width:24px;
+}
+.rail button .lbl{
+  font-size:14px;
+  line-height:1.3;
+}
+.rail button .date{
+  display:block;
+  font-size:11.5px;
+  color:var(--sage);
+  margin-top:1px;
+}
+.rail button.active{
+  border-left-color:var(--terracotta);
+  color:var(--ink);
+}
+.rail button.active .num{ color:var(--terracotta); }
+.rail button:hover{ color:var(--ink); }
+
+main.journal{
+  padding:48px 0 100px;
+  min-width:0;
+}
+
+.day-panel{ display:none; }
+.day-panel.active{ display:block; animation:rise .35s ease; }
+@keyframes rise{
+  from{ opacity:0; transform:translateY(6px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+.day-head{
+  display:flex;
+  gap:24px;
+  align-items:flex-start;
+  padding-bottom:28px;
+  margin-bottom:36px;
+  border-bottom:1px solid var(--rule);
+}
+.day-num{
+  font-family:var(--serif);
+  font-size:88px;
+  line-height:0.85;
+  font-weight:400;
+  color:var(--terracotta);
+  opacity:0.9;
+}
+.day-head-text h2{
+  font-family:var(--serif);
+  font-weight:500;
+  font-size:32px;
+  margin-bottom:6px;
+}
+.day-head-text .day-tag{
+  display:inline-block;
+  font-size:13px;
+  color:var(--forest);
+  background:rgba(75,93,69,0.09);
+  padding:3px 10px;
+  border-radius:2px;
+  margin-bottom:10px;
+}
+.day-head-text p{
+  color:var(--ink-soft);
+  max-width:62ch;
+  font-size:15px;
+}
+
+.stops{
+  list-style:none;
+  position:relative;
+}
+.stops::before{
+  content:'';
+  position:absolute;
+  left:19px;
+  top:8px;
+  bottom:8px;
+  width:1px;
+  background:var(--rule);
+}
+.stop{
+  display:grid;
+  grid-template-columns:40px 1fr;
+  gap:20px;
+  padding-bottom:34px;
+  position:relative;
+}
+.stop:last-child{ padding-bottom:0; }
+.stop-index{
+  width:40px; height:40px;
+  border-radius:50%;
+  background:var(--paper);
+  border:1px solid var(--rule);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--serif);
+  font-size:16px;
+  color:var(--ink-soft);
+  position:relative;
+  z-index:1;
+}
+.stop.transit .stop-index{
+  border-style:dashed;
+  color:var(--sage);
+}
+.stop-body{ padding-top:4px; }
+.stop-time{
+  font-size:12.5px;
+  color:var(--terracotta);
+  font-weight:600;
+  margin-bottom:4px;
+  letter-spacing:0.01em;
+}
+.stop-name{
+  font-family:var(--serif);
+  font-size:21px;
+  font-weight:500;
+  margin-bottom:6px;
+}
+.stop-note{
+  color:var(--ink-soft);
+  font-size:14.5px;
+  max-width:60ch;
+  margin-bottom:10px;
+}
+.stop-links{
+  display:flex; gap:16px; flex-wrap:wrap;
+}
+.stop-links a{
+  font-size:13px;
+  text-decoration:none;
+  color:var(--forest);
+  border-bottom:1px solid var(--forest);
+  padding-bottom:1px;
+}
+.stop-links a:hover{ color:var(--terracotta); border-color:var(--terracotta); }
+.stop.transit .stop-name{ font-size:16px; color:var(--ink-soft); font-family:var(--sans); font-weight:600;}
+
+.callout{
+  margin-top:36px;
+  padding:20px 22px;
+  background:var(--paper-raised);
+  border-left:3px solid var(--gold);
+  font-size:14.5px;
+  color:var(--ink-soft);
+  max-width:70ch;
+}
+.callout strong{ color:var(--ink); font-weight:600; }
+
+/* mobile rail */
+.rail-mobile{
+  display:none;
+}
+
+footer{
+  border-top:1px solid var(--rule);
+  padding:28px;
+  text-align:center;
+  font-size:13px;
+  color:var(--ink-soft);
+}
+
+@media (max-width:860px){
+  .layout{ grid-template-columns:1fr; }
+  nav.rail{
+    position:sticky; top:0; z-index:10;
+    height:auto;
+    display:flex;
+    overflow-x:auto;
+    border-right:none;
+    border-bottom:1px solid var(--rule);
+    background:var(--paper);
+    padding:14px 0;
+    gap:4px;
+  }
+  .rail-label{ display:none; }
+  .rail button{
+    flex:0 0 auto;
+    flex-direction:column;
+    gap:2px;
+    border-left:none;
+    border-bottom:2px solid transparent;
+    padding:6px 16px;
+    white-space:nowrap;
+  }
+  .rail button.active{ border-bottom-color:var(--terracotta); }
+  .day-num{ font-size:56px; }
+  .day-head{ gap:16px; }
+  h1.hero-title{ max-width:none; }
+  main.journal{ padding:32px 0 70px; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow-row">
+      <span>Tbilisi, Georgia</span><span class="dot">·</span><span>6 days, mostly on foot</span>
+    </div>
+    <h1 class="hero-title">Six days walking <em>Tbilisi</em></h1>
+    <p class="hero-sub">An old town of sulfur baths and balconies, two mountain days by hired driver, and a battlefield memorial in the hills west of the city.</p>
+    <div class="hero-meta">
+      <div>Arrive<strong>Mon, Sept 7</strong></div>
+      <div>Depart<strong>Sun, Sept 13, ~22:00</strong></div>
+      <div>Pace<strong>Walking + taxi</strong></div>
+      <div>Weather<strong>18–24°C, dry</strong></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="layout">
+
+  <nav class="rail" id="rail">
+    <div class="rail-label">Itinerary</div>
+    <!-- buttons injected by JS -->
+  </nav>
+
+  <main class="journal" id="journal">
+    <!-- panels injected by JS -->
+  </main>
+
+</div>
+</div>
+
+<footer>Built for a trip to Tbilisi · pinch to zoom on mobile · tap a stop to open directions</footer>
+
+<script>
+const days = [
+  {
+    date:"Tue, Sept 8",
+    tag:"Old Town",
+    title:"Baths, fortress, river",
+    intro:"Everything today sits within a 20-minute walk of everything else. No taxis needed.",
+    stops:[
+      {time:"10:00", name:"Abanotubani sulfur baths", note:"The domed bathhouse district — walk through, or book a private soak if you want one.", map:"Abanotubani Tbilisi"},
+      {time:"12:00", name:"Narikala Fortress + Mother of Georgia", note:"Cable car up from Rike Park saves the climb; walk the ramparts, then descend on foot.", map:"Narikala Fortress Tbilisi"},
+      {time:"15:00", name:"Bridge of Peace & Rike Park", note:"The glass footbridge over the Mtkvari — best light in late afternoon.", map:"Bridge of Peace Tbilisi"},
+      {time:"19:30", name:"Dinner, Shardeni Street", note:"The old town's café strip — easy, no reservation needed.", map:"Shardeni Street Tbilisi"}
+    ]
+  },
+  {
+    date:"Wed, Sept 9",
+    tag:"New Town + Museums",
+    title:"Rustaveli to Sameba",
+    intro:"Walking through midday, one taxi hop out to the cathedral in the afternoon.",
+    stops:[
+      {time:"10:00", name:"Freedom Square", note:"Starting point for Rustaveli Avenue.", map:"Freedom Square Tbilisi"},
+      {time:"10:20", name:"Rustaveli Avenue", note:"Tbilisi's grand boulevard — theatres, opera house, parliament.", map:"Rustaveli Avenue Tbilisi"},
+      {time:"11:00", name:"Georgian National Museum", note:"The archaeological gold collection is the highlight if time is short.", map:"Georgian National Museum"},
+      {time:"13:30", name:"Dry Bridge flea market", note:"Soviet ephemera, old coins, hand-woven textiles.", map:"Dry Bridge Market Tbilisi"},
+      {time:"15:30", name:"Taxi to Sameba Cathedral", note:"Dress modestly — shoulders and knees covered. Tourists generally let in after 11am.", map:"", transit:true},
+      {time:"16:00", name:"Holy Trinity Cathedral (Sameba)", note:"Georgia's largest cathedral, on a hill above the city.", map:"Sameba Cathedral Tbilisi"},
+      {time:"19:00", name:"Evening at Fabrika", note:"Former Soviet sewing factory turned courtyard bars, shops, and hostel.", map:"Fabrika Tbilisi"}
+    ]
+  },
+  {
+    date:"Thu, Sept 10",
+    tag:"Driver day",
+    title:"Didgori, Manglisi, Mtskheta",
+    intro:"Hire a driver for the full day — Didgori is remote with little to flag a ride back with. Bolt or Yandex Go both work for booking.",
+    stops:[
+      {time:"09:00", name:"Depart Tbilisi by car", note:"~1–1.5h to Didgori.", map:"", transit:true},
+      {time:"10:30", name:"Didgori Battle Memorial", note:"The \"Broken Sword Mountain\" site, commemorating the 1121 battle. Windy — bring a layer.", map:"Didgori Battle Memorial"},
+      {time:"12:30", name:"Manglisi Sioni Cathedral", note:"11th-century cathedral in a quiet mountain town near Didgori.", map:"Manglisi Sioni Cathedral"},
+      {time:"14:30", name:"Jvari Monastery", note:"6th-century monastery on the hill overlooking Mtskheta's river confluence.", map:"Jvari Monastery"},
+      {time:"16:00", name:"Svetitskhoveli Cathedral, Mtskheta", note:"Georgia's spiritual center — where Georgia's conversion to Christianity is rooted.", map:"Svetitskhoveli Cathedral"},
+      {time:"18:00", name:"Drive back to Tbilisi", note:"~30 min.", map:"", transit:true}
+    ]
+  },
+  {
+    date:"Fri, Sept 11",
+    tag:"Driver day",
+    title:"Kazbegi",
+    intro:"The longest day — roughly 3 hours each way on the Georgian Military Highway. Consider swapping for Kakheti if two driving days feels like too much.",
+    stops:[
+      {time:"08:00", name:"Depart Tbilisi", note:"Georgian Military Highway north.", map:"", transit:true},
+      {time:"09:30", name:"Ananuri Fortress", note:"Stop on the way — fortress complex on the Zhinvali Reservoir.", map:"Ananuri Fortress"},
+      {time:"11:30", name:"Arrive Stepantsminda (Kazbegi)", note:"Base village below Mount Kazbek.", map:"Stepantsminda"},
+      {time:"12:00", name:"Gergeti Trinity Church", note:"By 4x4 up the track, or a ~1.5h hike if you want the climb.", map:"Gergeti Trinity Church"},
+      {time:"15:00", name:"Drive back to Tbilisi", note:"~3h, arriving evening.", map:"", transit:true}
+    ]
+  },
+  {
+    date:"Sat, Sept 12",
+    tag:"Free day",
+    title:"Buffer — or Kakheti",
+    intro:"Left open on purpose. Good for anything skipped earlier, a slow walking day, or swap in Kakheti wine country if you'd rather not repeat a long drive.",
+    stops:[
+      {time:"—", name:"Option A: Slow city day", note:"Revisit a neighborhood, extend the sulfur bath soak, wander Vera or Sololaki's balconied streets.", map:"Sololaki Tbilisi"},
+      {time:"—", name:"Option B: Kakheti day trip", note:"Sighnaghi's town walls and Bodbe Monastery — similar distance to Kazbegi, gentler pace, wine tastings along the way.", map:"Sighnaghi Georgia"}
+    ]
+  },
+  {
+    date:"Sun, Sept 13",
+    tag:"Departure",
+    title:"Last morning, flight ~22:00",
+    intro:"A light day — most of it is packing and a last walk, with the evening kept clear for the airport.",
+    stops:[
+      {time:"11:00", name:"Shardeni Street", note:"Last coffee and any souvenirs before heading back to pack.", map:"Shardeni Street Tbilisi"},
+      {time:"19:00", name:"Head to Tbilisi International Airport", note:"Flight around 22:00 — allow time for evening traffic.", map:"Tbilisi International Airport", transit:true}
+    ]
+  }
+];
+
+const rail = document.getElementById('rail');
+const journal = document.getElementById('journal');
+
+days.forEach((d, i) => {
+  const btn = document.createElement('button');
+  btn.dataset.index = i;
+  btn.innerHTML = `<span class="num">${i+1}</span><span class="lbl">${d.tag}<span class="date">${d.date.split(', ')[1]}</span></span>`;
+  btn.addEventListener('click', () => showDay(i));
+  rail.appendChild(btn);
+
+  const panel = document.createElement('section');
+  panel.className = 'day-panel';
+  panel.id = `day-${i}`;
+
+  let stopsHtml = '';
+  d.stops.forEach((s, si) => {
+    const mapLink = s.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.map)}" target="_blank" rel="noopener">Get directions</a>` : '';
+    stopsHtml += `
+      <li class="stop${s.transit ? ' transit' : ''}">
+        <div class="stop-index">${s.transit ? '→' : si+1}</div>
+        <div class="stop-body">
+          <div class="stop-time">${s.time}</div>
+          <div class="stop-name">${s.name}</div>
+          <div class="stop-note">${s.note}</div>
+          <div class="stop-links">${mapLink}</div>
+        </div>
+      </li>`;
+  });
+
+  panel.innerHTML = `
+    <div class="day-head">
+      <div class="day-num">${i+1}</div>
+      <div class="day-head-text">
+        <span class="day-tag">${d.date}</span>
+        <h2>${d.title}</h2>
+        <p>${d.intro}</p>
+      </div>
+    </div>
+    <ul class="stops">${stopsHtml}</ul>
+  `;
+  journal.appendChild(panel);
+});
+
+function showDay(i){
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.rail button').forEach(b => b.classList.remove('active'));
+  document.getElementById(`day-${i}`).classList.add('active');
+  document.querySelector(`.rail button[data-index="${i}"]`).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+showDay(0);
+</script>
+
+</body>
+</html>
