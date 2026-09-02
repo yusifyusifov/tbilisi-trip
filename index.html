@@ -366,7 +366,7 @@ footer{
       <span>Tbilisi, Georgia</span><span class="dot">·</span><span>6 days, mostly on foot</span>
     </div>
     <h1 class="hero-title">Six days walking <em>Tbilisi</em></h1>
-    <p class="hero-sub">An old town of sulfur baths and balconies, two mountain days by hired driver, and a battlefield memorial in the hills west of the city.</p>
+    <p class="hero-sub">An old town of sulfur baths and balconies, a driver day into the hills west of the city, and a green mountain park that frames it all.</p>
     <div class="hero-meta">
       <div>Arrive<strong>Mon, Sept 7</strong></div>
       <div>Depart<strong>Sun, Sept 13, ~22:00</strong></div>
@@ -443,29 +443,30 @@ const days = [
   },
   {
     date:"Fri, Sept 11",
-    tag:"Driver day",
-    title:"Kazbegi",
-    intro:"The longest day — roughly 3 hours each way on the Georgian Military Highway. Consider swapping for Kakheti if two driving days feels like too much.",
-    mode:"driving",
+    tag:"In the city",
+    title:"Mtatsminda & Vake",
+    intro:"Everything today is inside the city — funicular and cable car do the climbing for you, no driver needed.",
+    mode:"walking",
     stops:[
-      {time:"08:00", name:"Depart Tbilisi", note:"Georgian Military Highway north.", map:"", transit:true},
-      {time:"09:30", name:"Ananuri Fortress", note:"Stop on the way — fortress complex on the Zhinvali Reservoir.", map:"Ananuri Fortress"},
-      {time:"11:30", name:"Arrive Stepantsminda (Kazbegi)", note:"Base village below Mount Kazbek.", map:"Stepantsminda Georgia"},
-      {time:"12:00", name:"Gergeti Trinity Church", note:"By 4x4 up the track, or a ~1.5h hike if you want the climb.", map:"Gergeti Trinity Church"},
-      {time:"15:00", name:"Drive back to Tbilisi", note:"~3h, arriving evening.", map:"", transit:true}
+      {time:"10:00", name:"Funicular to Mtatsminda Park", note:"Ride up from the station near Chonkadze Street — views over the whole city on the way.", map:"Mtatsminda Park Funicular Tbilisi"},
+      {time:"11:00", name:"Mtatsminda Pantheon", note:"Burial ground for Georgia's writers and artists, right by the upper funicular station.", map:"Mtatsminda Pantheon Tbilisi"},
+      {time:"12:30", name:"Walk or taxi down to Vake Park", note:"~20 min walk down the mountain, or a short taxi if you'd rather skip it.", map:"", transit:true},
+      {time:"13:00", name:"Vake Park", note:"Tbilisi's big green park — wide tree-lined paths, popular with locals for a stroll.", map:"Vake Park Tbilisi"},
+      {time:"14:30", name:"Cable car to Turtle Lake", note:"Small reservoir above Vake Park, ringed by cafés — a good lunch stop.", map:"Turtle Lake Tbilisi"},
+      {time:"17:00", name:"Leghvtakhevi Gorge & waterfall", note:"A short walk from the old town, tucked behind Abanotubani — easy to fold into the walk back.", map:"Leghvtakhevi Waterfall Tbilisi"}
     ]
   },
   {
     date:"Sat, Sept 12",
     tag:"Free day",
-    title:"Buffer — or Kakheti",
-    intro:"Left open on purpose. Good for anything skipped earlier, a slow walking day, or swap in Kakheti wine country if you'd rather not repeat a long drive.",
+    title:"Buffer day",
+    intro:"Left open on purpose. Good for anything skipped earlier, a slow walking day, or a half-day trip if there's a specific site you'd still like to fit in.",
     mode:"driving",
     noRoute:true,
     stops:[
       {time:"—", name:"Option A: Slow city day (Sololaki)", note:"Revisit a neighborhood, extend the sulfur bath soak, wander Vera or Sololaki's balconied streets.", map:"Sololaki Tbilisi"},
-      {time:"—", name:"Option B: Sighnaghi (Kakheti)", note:"The walled hill town — similar distance to Kazbegi, gentler pace, wine tastings along the way.", map:"Sighnaghi Georgia"},
-      {time:"—", name:"Option B: Bodbe Monastery", note:"2km from Sighnaghi — St. Nino's resting place, gardens over the Alazani Valley.", map:"Bodbe Monastery"}
+      {time:"—", name:"Option B: Kazbegi, shortened", note:"If you still want a taste of the mountains without the full round trip, Ananuri Fortress alone is under an hour each way and a good half-day out.", map:"Ananuri Fortress"},
+      {time:"—", name:"Option C: Rest", note:"Six days of walking and two driver days is a lot — a genuinely unplanned day is also a fine choice.", map:""}
     ]
   },
   {
